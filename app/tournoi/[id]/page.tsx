@@ -69,7 +69,7 @@ export default function TournamentDetail() {
     { icon: Calendar, label: 'Date', value: formatDate(t.date) },
     { icon: Clock, label: 'Heure', value: formatTime(t.time) },
     { icon: MapPin, label: 'Ville', value: t.city },
-    { icon: Users, label: 'Joueurs', value: `${t.players_count} joueurs` },
+    { icon: Users, label: 'Équipes max', value: `${t.players_count} équipes` },
   ];
 
   return (
