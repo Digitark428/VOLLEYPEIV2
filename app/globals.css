@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #FAFAFA;
+  --surface: #FFFFFF;
+  --surface-2: #F4F4F5;
+  --border: #E4E4E7;
+  --text: #18181B;
+  --text-muted: #71717A;
+  --accent: #09090B;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  letter-spacing: -0.011em;
+}
+
+body {
+  /* Texture subtile en fond, façon Shadow.tech */
+  background-image:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,0,0,0.04), transparent 60%),
+    radial-gradient(ellipse 80% 50% at 100% 100%, rgba(30, 64, 175, 0.03), transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Scrollbar premium */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); background-clip: padding-box; }
+
+/* Selection */
+::selection { background: rgba(9, 9, 11, 0.92); color: #FAFAFA; }
+
+/* Focus visible élégant */
+:focus-visible {
+  outline: 2px solid #09090B;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Heading typography */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
+}
+
+/* Utilitaires */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(228, 228, 231, 0.6);
+}
+
+.glass-dark {
+  background: rgba(24, 24, 27, 0.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.card-gradient {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #18181B 0%,
+    #18181B 40%,
+    #71717A 50%,
+    #18181B 60%,
+    #18181B 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-bg 4s linear infinite;
+}
+
+@keyframes shimmer-bg {
+  to { background-position: -200% 0; }
+}
+
+/* Grid pattern en fond */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Bouton premium gradient liseré */
+.btn-premium {
+  position: relative;
+  background: #09090B;
+  color: #FAFAFA;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.15);
+}
+.btn-premium:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1), 0 16px 40px rgba(0,0,0,0.2);
+}
+.btn-premium:active {
+  transform: translateY(0);
+}
+
+/* Animation logo splash */
+.splash-glow {
+  filter: drop-shadow(0 0 24px rgba(30,64,175,0.25))
+          drop-shadow(0 0 48px rgba(245,158,11,0.15));
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 24px rgba(30,64,175,0.25))
+            drop-shadow(0 0 48px rgba(245,158,11,0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 36px rgba(30,64,175,0.4))
+            drop-shadow(0 0 72px rgba(245,158,11,0.25))
+            drop-shadow(0 0 96px rgba(220,38,38,0.15));
+  }
+}
+
+/* Leaflet */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 1.5rem;
+  font-family: inherit;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+.leaflet-popup-tip { display: none; }
+.leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+  width: 280px !important;
+}
+.leaflet-popup-close-button {
+  display: none !important;
+}
+
+/* No-scroll lock */
+.no-scroll { overflow: hidden; }
+
+/* Print: hide nav */
+@media print {
+  header, footer, .no-print { display: none !important; }
+}
