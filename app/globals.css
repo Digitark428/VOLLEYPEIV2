@@ -43,6 +43,10 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); background-clip: padding-box; }
 
+/* Scrollbar masquée (utilisée pour les filtres horizontaux) */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
 /* Selection */
 ::selection { background: rgba(9, 9, 11, 0.92); color: #FAFAFA; }
 

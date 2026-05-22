@@ -4,6 +4,23 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  // Couleurs des catégories de tournois (construites dynamiquement dans lib/utils.ts)
+  safelist: [
+    // Beach volley → orange
+    'bg-orange-500', 'bg-orange-100', 'text-orange-800', 'ring-orange-200',
+    // Volley indoor → zinc/gris
+    'bg-zinc-600', 'bg-zinc-100', 'text-zinc-800', 'ring-zinc-200',
+    // Green volley → emerald
+    'bg-emerald-600', 'bg-emerald-100', 'text-emerald-800', 'ring-emerald-200',
+    // Officiel LRVB → blue
+    'bg-blue-600', 'bg-blue-100', 'text-blue-800', 'ring-blue-200',
+    // Sparing → red
+    'bg-red-600', 'bg-red-100', 'text-red-800', 'ring-red-200',
+    // Loisirs → pink
+    'bg-pink-500', 'bg-pink-100', 'text-pink-800', 'ring-pink-200',
+    // Bouton filtre "Tout"
+    'bg-ink-900',
+  ],
   theme: {
     extend: {
       fontFamily: {

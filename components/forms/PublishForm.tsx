@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import { Field, Input, Textarea, Select } from '@/components/ui/Input';
 import { TOURNAMENT_TYPES } from '@/lib/utils';
 import { supabase, type TournamentType } from '@/lib/supabase';
+import { sendNotification, buildNewTournamentNotification } from '@/lib/notifications';
 
 type Step = 'warning' | 'form' | 'confirm' | 'success';
 
@@ -90,7 +91,7 @@ export default function PublishForm({ open, onClose, onPublished }: Props) {
     if (!form.type) return 'Type de tournoi requis.';
     if (!form.location.trim()) return 'Lieu précis requis.';
     if (!form.players_count || parseInt(form.players_count) <= 0)
-      return 'Nombre de joueurs requis.';
+      return "Nombre d'équipes requis.";
     if (!form.description.trim()) return 'Description requise.';
     if (!form.posterFile) return 'Affiche du tournoi requise.';
     return null;
@@ -125,20 +126,37 @@ export default function PublishForm({ open, onClose, onPublished }: Props) {
       const posterUrl = pub.publicUrl;
 
       // 2. Insert tournoi
-      const { error: insErr } = await supabase.from('tournaments').insert({
-        name: form.name.trim(),
-        date: form.date,
-        time: form.time,
-        city: form.city.trim(),
-        type: form.type,
-        location: form.location.trim(),
-        players_count: parseInt(form.players_count, 10),
-        description: form.description.trim(),
-        poster_url: posterUrl,
-        phone: form.phone.trim() || null,
-        email: form.email.trim() || null,
-      });
+      const { data: created, error: insErr } = await supabase
+        .from('tournaments')
+        .insert({
+          name: form.name.trim(),
+          date: form.date,
+          time: form.time,
+          city: form.city.trim(),
+          type: form.type,
+          location: form.location.trim(),
+          players_count: parseInt(form.players_count, 10),
+          description: form.description.trim(),
+          poster_url: posterUrl,
+          phone: form.phone.trim() || null,
+          email: form.email.trim() || null,
+        })
+        .select()
+        .single();
       if (insErr) throw insErr;
+
+      // 3. Notification (stub aujourd'hui, actif quand on activera le module)
+      if (created) {
+        sendNotification(
+          buildNewTournamentNotification({
+            tournamentId: created.id,
+            name: created.name,
+            date: created.date,
+            city: created.city,
+            type: created.type,
+          })
+        );
+      }
 
       setStep('success');
       onPublished?.();
@@ -308,13 +326,13 @@ export default function PublishForm({ open, onClose, onPublished }: Props) {
               />
             </Field>
 
-            <Field label="Nombre de joueurs attendus" required>
+            <Field label="Nombre d'équipes maximum" required>
               <Input
                 type="number"
                 min={2}
                 value={form.players_count}
                 onChange={(e) => setForm({ ...form, players_count: e.target.value })}
-                placeholder="32"
+                placeholder="16"
               />
             </Field>
 

@@ -41,19 +41,14 @@ export default function Header() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-[72px]">
-          {/* Logo + nom */}
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-[-4deg]">
+            <div className="transition-transform duration-500 group-hover:scale-105">
               <Logo />
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-display font-semibold text-[17px] tracking-tight text-ink-900">
-                Volley <span className="text-ink-500">Péi</span>
-              </span>
-              <span className="text-[10px] text-ink-400 tracking-[0.15em] uppercase mt-0.5 hidden sm:block">
-                Calendrier 974
-              </span>
-            </div>
+            <span className="hidden sm:block text-[10px] text-ink-400 tracking-[0.15em] uppercase">
+              Calendrier 974
+            </span>
           </Link>
 
           {/* Nav desktop */}

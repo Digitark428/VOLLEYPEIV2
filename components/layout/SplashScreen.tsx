@@ -49,11 +49,9 @@ export default function SplashScreen() {
             initial={{ opacity: 0, scale: 0.9, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative flex flex-col items-center gap-6 splash-glow"
+            className="relative flex flex-col items-center gap-5 splash-glow"
           >
-            <div className="w-28 h-28 sm:w-32 sm:h-32">
-              <Logo variant="splash" />
-            </div>
+            <Logo variant="splash" />
 
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -61,10 +59,7 @@ export default function SplashScreen() {
               transition={{ delay: 0.3, duration: 0.7 }}
               className="text-center"
             >
-              <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-white">
-                Volley <span className="text-reunion-yellow">Péi</span>
-              </h1>
-              <p className="mt-2 text-sm text-ink-400 tracking-wide">
+              <p className="text-sm text-ink-400 tracking-wide">
                 Le volley à La Réunion · 974
               </p>
             </motion.div>
@@ -74,7 +69,7 @@ export default function SplashScreen() {
               initial={{ width: 0 }}
               animate={{ width: 80 }}
               transition={{ delay: 0.4, duration: 1.6, ease: 'easeInOut' }}
-              className="mt-4 h-px bg-gradient-to-r from-reunion-blue via-reunion-yellow to-reunion-red"
+              className="mt-2 h-px bg-gradient-to-r from-reunion-blue via-reunion-yellow to-reunion-red"
             />
           </motion.div>
         </motion.div>

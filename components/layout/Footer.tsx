@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9"><Logo /></div>
+              <div><Logo /></div>
               <span className="font-display font-semibold text-base">
                 Volley <span className="text-ink-500">Péi</span>
               </span>

@@ -141,6 +141,25 @@ supabase/
 
 ---
 
+## 🔔 Notifications (préparé pour le futur)
+
+L'architecture est en place dans `lib/notifications/` :
+
+- **`types.ts`** — types `NotificationType`, `NotificationPayload`, `NotificationPreferences`
+- **`index.ts`** — API publique (`sendNotification`, `scheduleNotification`, helpers de payloads)
+- **`supabase/notifications.sql`** — schéma DB à activer le moment venu (tables `notifications` + `notification_subscriptions`)
+
+Les hooks sont déjà branchés (ex. `PublishForm` appelle `sendNotification` après publication d'un tournoi). Aujourd'hui ce sont des **stubs** (no-op + log en dev). Pour activer plus tard :
+
+1. Exécuter `supabase/notifications.sql` dans Supabase
+2. Implémenter le service worker pour push web (VAPID)
+3. Ajouter un service email si besoin (Resend, SendGrid…)
+4. Remplir le corps des fonctions dans `lib/notifications/index.ts`
+
+L'API ne change pas — aucun refactor à faire dans le reste du code.
+
+---
+
 ## 🛠 Production
 
 ```bash

@@ -259,7 +259,7 @@ function EditTournamentModal({
         <Field label="Lieu précis" required>
           <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
         </Field>
-        <Field label="Nombre de joueurs" required>
+        <Field label="Nombre d'équipes maximum" required>
           <Input
             type="number"
             value={form.players_count}

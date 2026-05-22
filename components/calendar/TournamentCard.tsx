@@ -65,7 +65,7 @@ export default function TournamentCard({ tournament: t, index = 0 }: Props) {
             </p>
             <p className="flex items-center gap-2">
               <Users className="w-3.5 h-3.5 flex-shrink-0" />
-              {t.players_count} joueurs
+              {t.players_count} équipes
             </p>
           </div>
         </div>
