@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import { Field, Input, Textarea, Select } from '@/components/ui/Input';
 import { TOURNAMENT_TYPES } from '@/lib/utils';
 import { supabase, type TournamentType } from '@/lib/supabase';
-import { sendNotification, buildNewTournamentNotification } from '@/lib/notifications';
+import { NotificationFactory } from '@/lib/notifications';
 
 type Step = 'warning' | 'form' | 'confirm' | 'success';
 
@@ -147,15 +147,7 @@ export default function PublishForm({ open, onClose, onPublished }: Props) {
 
       // 3. Notification (stub aujourd'hui, actif quand on activera le module)
       if (created) {
-        sendNotification(
-          buildNewTournamentNotification({
-            tournamentId: created.id,
-            name: created.name,
-            date: created.date,
-            city: created.city,
-            type: created.type,
-          })
-        );
+        NotificationFactory.tournamentNew(created.id, created.name);
       }
 
       setStep('success');
