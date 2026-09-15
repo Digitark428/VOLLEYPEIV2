@@ -35,6 +35,6 @@ export async function requireIdentity(next = '/connexion') {
 
 export async function requireAdmin() {
   const identity = await requireIdentity('/connexion?retour=/admin');
-  if (!identity.isAdmin) redirect('/profil?erreur=acces-refuse');
+  if (!identity.isAdmin || identity.profile?.status !== 'active') redirect('/profil?erreur=acces-refuse');
   return identity;
 }
