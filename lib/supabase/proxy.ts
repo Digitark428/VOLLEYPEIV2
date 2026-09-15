@@ -24,6 +24,24 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+  const pathname = request.nextUrl.pathname;
+  const isPublicRoute =
+    pathname === '/connexion' ||
+    pathname === '/inscription' ||
+    pathname === '/mot-de-passe-oublie' ||
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/autorisation-parentale/');
+
+  if (!data?.claims?.sub && !isPublicRoute) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/connexion';
+    loginUrl.search = '';
+    if (pathname !== '/') loginUrl.searchParams.set('retour', `${pathname}${request.nextUrl.search}`);
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
+    return redirectResponse;
+  }
+
   return response;
 }

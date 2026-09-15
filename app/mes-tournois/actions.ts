@@ -65,3 +65,20 @@ export async function createTournament(formData: FormData) {
   revalidatePath('/mes-tournois');
   redirect(`/tournoi/${tournament.id}?message=Tournoi%20publié.`);
 }
+
+export async function reviewResultClaim(formData: FormData) {
+  const identity = await requireIdentity();
+  const tournamentId = value(formData, 'tournament_id');
+  const claimId = value(formData, 'claim_id');
+  const decision = value(formData, 'decision');
+  if (!claimId || !tournamentId || !['confirmed', 'rejected'].includes(decision)) redirect(`/mes-tournois/${tournamentId}/inscriptions?erreur=Décision%20invalide.`);
+  const supabase = await createServerSupabaseClient();
+  const { data: tournament } = await supabase.from('tournaments').select('association_id').eq('id', tournamentId).maybeSingle();
+  if (!tournament) redirect(`/mes-tournois?erreur=Tournoi%20introuvable.`);
+  const { data: membership } = await supabase.from('association_members').select('id').eq('association_id', tournament.association_id).eq('user_id', identity.id).eq('status', 'active').in('role', ['owner', 'admin']).maybeSingle();
+  if (!membership && !identity.isAdmin) redirect(`/mes-tournois/${tournamentId}/inscriptions?erreur=Accès%20refusé.`);
+  const { error } = await supabase.rpc('review_tournament_result_claim', { target_claim: claimId, decision });
+  if (error) redirect(`/mes-tournois/${tournamentId}/inscriptions?erreur=${encodeURIComponent(error.message)}`);
+  revalidatePath(`/mes-tournois/${tournamentId}/inscriptions`); revalidatePath(`/tournoi/${tournamentId}`);
+  redirect(`/mes-tournois/${tournamentId}/inscriptions?message=${decision === 'confirmed' ? 'Résultat%20confirmé.' : 'Résultat%20refusé.'}`);
+}

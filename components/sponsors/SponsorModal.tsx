@@ -3,6 +3,7 @@
 import Modal from '@/components/ui/Modal';
 import { Globe, Phone } from 'lucide-react';
 import type { Sponsor } from '@/lib/supabase';
+import { protectedMediaUrl } from '@/lib/media';
 
 interface Props {
   open: boolean;
@@ -20,7 +21,7 @@ export default function SponsorModal({ open, onClose, sponsor }: Props) {
         <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-ink-100">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={sponsor.image_url}
+            src={protectedMediaUrl(sponsor.image_url) ?? ''}
             alt={sponsor.name}
             className="w-full h-full object-cover"
           />
@@ -73,7 +74,7 @@ export default function SponsorModal({ open, onClose, sponsor }: Props) {
                   className="aspect-square rounded-xl overflow-hidden bg-ink-100"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <img src={protectedMediaUrl(url) ?? ''} alt="" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>

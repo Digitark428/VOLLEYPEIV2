@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { Sponsor } from '@/lib/supabase';
+import { protectedMediaUrl } from '@/lib/media';
 import { classNames } from '@/lib/utils';
 import { Sparkles } from 'lucide-react';
 
@@ -98,7 +99,7 @@ export default function SponsorSlot({
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={sponsor.image_url}
+            src={protectedMediaUrl(sponsor.image_url) ?? ''}
             alt={sponsor.name}
             className="absolute inset-0 w-full h-full object-cover"
           />

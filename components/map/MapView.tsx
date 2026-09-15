@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { formatDate, formatTime } from '@/lib/utils';
 import TypeBadge from '@/components/ui/TypeBadge';
 import type { Tournament } from '@/lib/supabase';
+import { protectedMediaUrl } from '@/lib/media';
 
 // Fix icônes Leaflet
 const icon = L.divIcon({
@@ -83,7 +84,7 @@ export default function MapView({ tournaments }: { tournaments: Tournament[] }) 
               <div className="aspect-[16/9] bg-ink-100 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={t.poster_url}
+                  src={protectedMediaUrl(t.poster_url) ?? ''}
                   alt={t.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

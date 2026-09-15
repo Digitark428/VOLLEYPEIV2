@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 export default function AuthShell({
@@ -24,10 +23,7 @@ export default function AuthShell({
         </div>
         <div className="rounded-3xl border border-ink-200 bg-white p-6 shadow-card sm:p-8">{children}</div>
         {footer && <div className="mt-6 text-center text-sm text-ink-500">{footer}</div>}
-        <p className="mt-8 text-center text-xs text-ink-400">
-          En continuant, tu acceptes les règles de la communauté VolleyPéi.{' '}
-          <Link href="/" className="underline underline-offset-2">Retour à l’accueil</Link>
-        </p>
+        <p className="mt-8 text-center text-xs text-ink-400">En continuant, tu acceptes les règles de la communauté VolleyPéi.</p>
       </div>
     </section>
   );

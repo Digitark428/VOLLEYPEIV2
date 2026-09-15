@@ -148,7 +148,7 @@ function PartnersContent() {
           Visibilité premium sur Volley Péi
         </h1>
         <p className="mt-3 text-base text-ink-500 max-w-xl mx-auto leading-relaxed">
-          Prévisualisation des emplacements sponsors disponibles sur le calendrier public.
+          Prévisualisation des emplacements sponsors disponibles dans le calendrier des membres.
         </p>
       </motion.div>
 

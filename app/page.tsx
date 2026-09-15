@@ -71,7 +71,7 @@ export default function HomePage() {
 
         <p className="mt-5 text-base sm:text-lg text-ink-500 max-w-2xl mx-auto leading-relaxed">
           Beach volley, indoor, green volley, tournois officiels LRVB.
-          Publication libre, calendrier public, mis à jour en temps réel par la communauté.
+          Publications, calendrier et rencontres, réservés à la communauté connectée.
         </p>
 
         {/* Bouton principal */}

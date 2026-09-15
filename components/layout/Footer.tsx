@@ -25,6 +25,8 @@ export default function Footer() {
           <div className="flex flex-col gap-2 text-sm">
             <h3 className="font-medium text-ink-900 mb-2 tracking-tight">Navigation</h3>
             <Link href="/" className="text-ink-500 hover:text-ink-900 transition-colors w-fit">Calendrier</Link>
+            <Link href="/actualite" className="text-ink-500 hover:text-ink-900 transition-colors w-fit">Feed d’actualité</Link>
+            <Link href="/recherche" className="text-ink-500 hover:text-ink-900 transition-colors w-fit">Recherche</Link>
             <Link href="/carte" className="text-ink-500 hover:text-ink-900 transition-colors w-fit">Carte</Link>
             <Link href="/partenaires" className="text-ink-500 hover:text-ink-900 transition-colors w-fit">Partenaires</Link>
           </div>

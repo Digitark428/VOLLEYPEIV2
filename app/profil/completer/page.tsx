@@ -29,14 +29,18 @@ export default async function CompleteProfilePage({ searchParams }: { searchPara
               <label className="text-sm font-medium">Date de naissance<input name="birth_date" type="date" defaultValue={privateProfile?.birth_date ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
               <label className="text-sm font-medium">Prénom<input name="first_name" defaultValue={profile?.first_name ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
               <label className="text-sm font-medium">Nom<input name="last_name" defaultValue={profile?.last_name ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
+              <label className="text-sm font-medium">Ville<input name="city" defaultValue={profile?.city ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
+              <label className="text-sm font-medium">Années de pratique<input name="years_practice" type="number" min="0" max="90" defaultValue={profile?.years_practice ?? 0} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
             </div>
             <label className="flex items-start gap-3 rounded-xl bg-ink-50 p-4 text-sm text-ink-700">
               <input name="show_real_name" type="checkbox" defaultChecked={profile?.show_real_name} className="mt-0.5" />
               Afficher mon prénom et mon nom sur mon profil public.
             </label>
+            <label className="flex items-start gap-3 rounded-xl bg-ink-50 p-4 text-sm text-ink-700"><input name="show_age" type="checkbox" defaultChecked={profile?.show_age} className="mt-0.5" />Afficher mon âge sur mon profil si je suis majeur. Pour un mineur, seule l’âge est affiché, jamais la date complète.</label>
             <label className="block text-sm font-medium">Club actuel<input name="club_name" defaultValue={profile?.club_name ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
             <label className="block text-sm font-medium">Bio<textarea name="bio" defaultValue={profile?.bio ?? ''} maxLength={1000} rows={4} className="mt-2 w-full resize-none rounded-xl border border-ink-200 px-4 py-3" /></label>
-            <label className="block text-sm font-medium">Expérience et palmarès<textarea name="experience_summary" defaultValue={profile?.experience_summary ?? ''} maxLength={2000} rows={4} className="mt-2 w-full resize-none rounded-xl border border-ink-200 px-4 py-3" /></label>
+            <label className="block text-sm font-medium">Expérience<textarea name="experience_summary" defaultValue={profile?.experience_summary ?? ''} maxLength={2000} rows={4} className="mt-2 w-full resize-none rounded-xl border border-ink-200 px-4 py-3" /></label>
+            <label className="block text-sm font-medium">Palmarès<textarea name="achievements" defaultValue={profile?.achievements ?? ''} maxLength={2000} rows={4} className="mt-2 w-full resize-none rounded-xl border border-ink-200 px-4 py-3" /></label>
             <fieldset>
               <legend className="text-sm font-medium">Disciplines pratiquées</legend>
               <div className="mt-3 flex flex-wrap gap-3">

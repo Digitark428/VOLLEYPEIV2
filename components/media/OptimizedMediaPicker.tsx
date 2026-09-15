@@ -42,8 +42,8 @@ export default function OptimizedMediaPicker({ usage, maxFiles = 1, associationI
           await supabase.storage.from('media-public').remove([path]);
           throw mediaError;
         }
-        const publicUrl = supabase.storage.from('media-public').getPublicUrl(path).data.publicUrl;
-        setItems((current) => [...current, { id: media.id, url: publicUrl, path, savedPercent: Math.max(0, Math.round((1 - optimized.file.size / optimized.originalBytes) * 100)) }]);
+        const previewUrl = URL.createObjectURL(optimized.file);
+        setItems((current) => [...current, { id: media.id, url: previewUrl, path, savedPercent: Math.max(0, Math.round((1 - optimized.file.size / optimized.originalBytes) * 100)) }]);
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Impossible de traiter cette image.');
@@ -53,6 +53,7 @@ export default function OptimizedMediaPicker({ usage, maxFiles = 1, associationI
   }
 
   async function remove(item: UploadedMedia) {
+    if (item.url.startsWith('blob:')) URL.revokeObjectURL(item.url);
     setItems((current) => current.filter((candidate) => candidate.id !== item.id));
     await supabase.from('media_assets').update({ deleted_at: new Date().toISOString() }).eq('id', item.id);
     await supabase.storage.from('media-public').remove([item.path]);

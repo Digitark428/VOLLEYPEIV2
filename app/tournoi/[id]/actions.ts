@@ -82,3 +82,18 @@ export async function submitTournamentRegistration(formData: FormData) {
   revalidatePath(`/tournoi/${tournamentId}`);
   redirect(`/tournoi/${tournamentId}?message=Inscription%20envoyée%20à%20l’association.`);
 }
+
+export async function submitResultClaim(formData: FormData) {
+  const tournamentId = value(formData, 'tournament_id');
+  const identity = await requireIdentity(`/connexion?retour=/tournoi/${tournamentId}`);
+  const rawPosition = value(formData, 'claimed_position');
+  const position = rawPosition ? Number.parseInt(rawPosition, 10) : null;
+  const label = value(formData, 'claimed_label') || null;
+  const note = value(formData, 'note') || null;
+  if (!tournamentId || ((!position || position < 1) && !label)) tournamentError(tournamentId, 'Indique une place ou un résultat.');
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.from('tournament_result_claims').upsert({ tournament_id: tournamentId, profile_id: identity.id, claimed_position: position, claimed_label: label, note, status: 'pending', reviewed_by: null, reviewed_at: null }, { onConflict: 'tournament_id,profile_id' });
+  if (error) tournamentError(tournamentId, `Impossible d’envoyer le résultat : ${error.message}`);
+  revalidatePath(`/tournoi/${tournamentId}`);
+  redirect(`/tournoi/${tournamentId}?message=Résultat%20envoyé%20à%20l’association%20pour%20confirmation.`);
+}

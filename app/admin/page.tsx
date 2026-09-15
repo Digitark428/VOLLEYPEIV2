@@ -25,7 +25,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const publicStats = Array.isArray(stats.data) ? stats.data[0] : null;
   const cards = [
     ['Utilisateurs', profiles.count ?? 0, UsersRound],
-    ['Joueurs', players.count ?? 0, UserRoundCheck],
+    ['Comptes joueur', players.count ?? 0, UserRoundCheck],
     ['Associations', associations.count ?? 0, Building2],
     ['Tournois total', tournaments.count ?? 0, CalendarDays],
     ['À venir', upcoming.count ?? 0, CalendarDays],
@@ -42,7 +42,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <AuthNotice error={params.erreur} message={params.message} />
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div><p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-reunion-blue"><ShieldCheck className="h-4 w-4" /> Admin VolleyPéi</p><h1 className="mt-3 font-display text-3xl font-semibold sm:text-5xl">Tableau de bord</h1><p className="mt-2 text-sm text-ink-500">Connecté avec {admin.email}</p></div>
-          <Link href="/" className="rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm font-medium">Voir le site public</Link>
+          <Link href="/" className="rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm font-medium">Voir l’espace membre</Link>
         </div>
         <AdminNav />
 

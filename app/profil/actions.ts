@@ -50,9 +50,13 @@ export async function updateProfile(formData: FormData) {
       first_name: text(formData, 'first_name'),
       last_name: text(formData, 'last_name'),
       show_real_name: formData.get('show_real_name') === 'on',
+      show_age: formData.get('show_age') === 'on',
+      city: text(formData, 'city'),
       club_name: text(formData, 'club_name'),
       bio: text(formData, 'bio'),
       experience_summary: text(formData, 'experience_summary'),
+      achievements: text(formData, 'achievements'),
+      years_practice: Math.max(0, Math.min(90, Number.parseInt(text(formData, 'years_practice') ?? '0', 10) || 0)),
       ...(avatarPath ? { avatar_path: avatarPath } : {}),
       disciplines,
       onboarding_completed: !isMinor,
@@ -76,6 +80,9 @@ export async function updateProfile(formData: FormData) {
 
   revalidatePath('/profil');
   revalidatePath(`/joueurs/${username}`);
+  revalidatePath('/actualite');
+  revalidatePath('/recherche');
+  revalidatePath('/', 'layout');
   if (isMinor) {
     const { data: token, error: tokenError } = await supabase.rpc('create_profile_guardian_consent_request');
     if (tokenError || !token) redirect(`/profil?erreur=${encodeURIComponent(tokenError?.message ?? 'Impossible de créer le lien parental.')}`);

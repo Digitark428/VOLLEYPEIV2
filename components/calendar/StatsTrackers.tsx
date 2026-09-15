@@ -43,7 +43,7 @@ export default function StatsTrackers() {
 
   const items = [
     {
-      label: 'Joueurs inscrits',
+      label: 'Membres inscrits',
       value: stats.players,
       icon: UserRound,
       accent: 'bg-emerald-500/10 text-emerald-700',

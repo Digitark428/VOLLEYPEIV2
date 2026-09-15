@@ -5,6 +5,7 @@ import Modal from '@/components/ui/Modal';
 import TypeBadge from '@/components/ui/TypeBadge';
 import { formatDate, formatTime } from '@/lib/utils';
 import type { Tournament } from '@/lib/supabase';
+import { protectedMediaUrl } from '@/lib/media';
 import { MapPin, Clock, ArrowRight } from 'lucide-react';
 
 interface Props {
@@ -38,7 +39,7 @@ export default function DayEventsModal({ open, onClose, date, tournaments }: Pro
               {t.poster_url && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={t.poster_url}
+                  src={protectedMediaUrl(t.poster_url) ?? ''}
                   alt={t.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

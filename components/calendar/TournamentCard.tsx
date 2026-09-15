@@ -6,6 +6,7 @@ import { Calendar, MapPin, Clock, Users } from 'lucide-react';
 import type { Tournament } from '@/lib/supabase';
 import TypeBadge from '@/components/ui/TypeBadge';
 import { formatDate, formatTime } from '@/lib/utils';
+import { protectedMediaUrl } from '@/lib/media';
 
 interface Props {
   tournament: Tournament;
@@ -29,7 +30,7 @@ export default function TournamentCard({ tournament: t, index = 0 }: Props) {
           {t.poster_url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={t.poster_url}
+              src={protectedMediaUrl(t.poster_url) ?? ''}
               alt={t.name}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />

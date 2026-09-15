@@ -13,7 +13,7 @@ export async function getCurrentIdentity() {
   const [{ data: profile }, { data: admin }] = await Promise.all([
     supabase
       .from('profiles')
-      .select('id, username, account_type, first_name, last_name, show_real_name, avatar_path, club_name, bio, experience_summary, disciplines, onboarding_completed, status')
+      .select('id, username, account_type, first_name, last_name, show_real_name, show_age, avatar_path, city, club_name, bio, experience_summary, disciplines, achievements, years_practice, onboarding_completed, status')
       .eq('id', userId)
       .maybeSingle(),
     supabase.from('platform_admins').select('user_id').eq('user_id', userId).maybeSingle(),
