@@ -1,0 +1,17 @@
+import Link from 'next/link';
+import AuthNotice from '@/components/auth/AuthNotice';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import { requireAdmin } from '@/lib/auth';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { updateUserStatus } from '../actions';
+
+type UserRow = { id: string; email: string; username: string; account_type: string; first_name: string | null; last_name: string | null; status: string; created_at: string; email_confirmed_at: string | null };
+
+export default async function AdminUsersPage({ searchParams }: { searchParams: Promise<{ erreur?: string; q?: string }> }) {
+  const [, params] = await Promise.all([requireAdmin(), searchParams]);
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc('admin_list_users');
+  const needle = params.q?.trim().toLowerCase() ?? '';
+  const users = ((data ?? []) as UserRow[]).filter((user) => !needle || [user.email, user.username, user.first_name, user.last_name].some((item) => item?.toLowerCase().includes(needle)));
+  return <section className="px-4 py-10"><div className="mx-auto max-w-7xl"><AdminPageHeader eyebrow="Administration" title="Utilisateurs" description="Consulte, suspends ou réactive les comptes sans casser leur historique communautaire." /><AuthNotice error={params.erreur ?? error?.message} /><form className="mt-7"><input name="q" defaultValue={params.q ?? ''} placeholder="Pseudo, nom ou e-mail" className="w-full max-w-md rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm" /></form><div className="mt-5 overflow-x-auto rounded-2xl border border-ink-200 bg-white"><table className="min-w-full text-left text-sm"><thead className="bg-ink-50 text-xs uppercase text-ink-400"><tr><th className="px-5 py-4">Compte</th><th className="px-5 py-4">E-mail</th><th className="px-5 py-4">Inscription</th><th className="px-5 py-4">Statut</th><th className="px-5 py-4">Action</th></tr></thead><tbody className="divide-y divide-ink-100">{users.map((user) => <tr key={user.id}><td className="px-5 py-4"><Link href={`/joueurs/${user.username}`} className="font-semibold hover:text-reunion-blue">@{user.username}</Link><p className="mt-1 text-xs text-ink-400">{user.account_type}</p></td><td className="px-5 py-4">{user.email}<p className="mt-1 text-xs text-ink-400">{user.email_confirmed_at ? 'E-mail confirmé' : 'Non confirmé'}</p></td><td className="px-5 py-4 text-ink-500">{new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(new Date(user.created_at))}</td><td className="px-5 py-4"><span className="rounded-full bg-ink-100 px-2.5 py-1 text-xs">{user.status}</span></td><td className="px-5 py-4"><form action={updateUserStatus} className="flex gap-2"><input type="hidden" name="user_id" value={user.id} />{user.status === 'active' ? <button name="status" value="suspended" className="rounded-lg border border-amber-200 px-3 py-2 text-xs text-amber-800">Suspendre</button> : <button name="status" value="active" className="rounded-lg border border-emerald-200 px-3 py-2 text-xs text-emerald-800">Réactiver</button>}<button name="status" value="deleted" className="rounded-lg border border-red-200 px-3 py-2 text-xs text-red-700">Supprimer</button></form></td></tr>)}</tbody></table>{users.length === 0 && <p className="p-8 text-center text-sm text-ink-500">Aucun utilisateur trouvé.</p>}</div></div></section>;
+}

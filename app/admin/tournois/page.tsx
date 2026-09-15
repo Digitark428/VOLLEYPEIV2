@@ -1,0 +1,14 @@
+import Link from 'next/link';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import AuthNotice from '@/components/auth/AuthNotice';
+import { requireAdmin } from '@/lib/auth';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { updateTournamentStatus } from '../actions';
+
+export default async function AdminTournamentsPage({ searchParams }: { searchParams: Promise<{ erreur?: string; q?: string; status?: string }> }) {
+  const [, params] = await Promise.all([requireAdmin(), searchParams]); const supabase = await createServerSupabaseClient();
+  let request = supabase.from('tournaments').select('id, name, date, city, status, views_count, association:associations(name)').is('deleted_at', null).order('date', { ascending: false }).limit(100);
+  if (params.q?.trim()) request = request.ilike('name', `%${params.q.trim()}%`); if (params.status) request = request.eq('status', params.status);
+  const { data, error } = await request;
+  return <section className="px-4 py-10"><div className="mx-auto max-w-7xl"><AdminPageHeader eyebrow="Administration" title="Tournois" description="Recherche, publication, archivage et modération de tous les événements." /><AuthNotice error={params.erreur ?? error?.message} /><form className="mt-7 flex flex-col gap-2 sm:flex-row"><input name="q" defaultValue={params.q ?? ''} placeholder="Rechercher un tournoi" className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm" /><select name="status" defaultValue={params.status ?? ''} className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"><option value="">Tous les statuts</option>{['published','cancelled','archived','hidden'].map((status) => <option key={status}>{status}</option>)}</select><button className="rounded-xl bg-ink-950 px-5 py-3 text-sm text-white">Filtrer</button></form><div className="mt-5 grid gap-3">{data?.map((tournament) => { const association = Array.isArray(tournament.association) ? tournament.association[0] : tournament.association; return <article key={tournament.id} className="rounded-2xl border border-ink-200 bg-white p-5"><div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center"><div><Link href={`/tournoi/${tournament.id}`} className="font-semibold">{tournament.name}</Link><p className="mt-1 text-xs text-ink-500">{tournament.date} · {tournament.city} · {association?.name ?? 'Ancien organisateur'} · {tournament.views_count} vues</p></div><form action={updateTournamentStatus} className="flex flex-wrap gap-2"><input type="hidden" name="tournament_id" value={tournament.id} />{['published','archived','cancelled','hidden'].map((status) => <button key={status} name="status" value={status} className={`rounded-lg px-3 py-2 text-xs ${tournament.status === status ? 'bg-ink-950 text-white' : 'border border-ink-200'}`}>{status}</button>)}</form></div></article>; })}</div></div></section>;
+}

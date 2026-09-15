@@ -2,6 +2,7 @@
 
 import { useEffect, useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { Lock, ShieldCheck } from 'lucide-react';
 import { supabase, type Sponsor, type Tournament } from '@/lib/supabase';
 import Calendar from '@/components/calendar/Calendar';
@@ -21,7 +22,10 @@ export default function PartenairesPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (sessionStorage.getItem('vp_partners') === '1') setUnlocked(true);
+    const frame = requestAnimationFrame(() => {
+      if (sessionStorage.getItem('vp_partners') === '1') setUnlocked(true);
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const handle = (e: FormEvent) => {
@@ -51,7 +55,7 @@ export default function PartenairesPage() {
             Espace partenaires
           </h1>
           <p className="mt-2 text-sm text-ink-500 leading-relaxed">
-            Vitrine privée. Code d'accès requis pour consulter les emplacements sponsors.
+            Vitrine privée. Code d&apos;accès requis pour consulter les emplacements sponsors.
           </p>
 
           <form onSubmit={handle} className="mt-7 flex flex-col gap-3 text-left">
@@ -68,7 +72,7 @@ export default function PartenairesPage() {
             )}
             <Button type="submit" className="mt-2">
               <ShieldCheck className="w-4 h-4" />
-              Accéder à l'espace
+              Accéder à l&apos;espace
             </Button>
           </form>
         </motion.div>
@@ -80,6 +84,7 @@ export default function PartenairesPage() {
 }
 
 function PartnersContent() {
+  const router = useRouter();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +119,7 @@ function PartnersContent() {
 
   const handleDay = (date: Date, events: Tournament[]) => {
     if (events.length === 1) {
-      window.location.href = `/tournoi/${events[0].id}`;
+      router.push(`/tournoi/${events[0].id}`);
       return;
     }
     setSelectedDate(date);

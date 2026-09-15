@@ -10,8 +10,8 @@ export default function SplashScreen() {
   useEffect(() => {
     // Affiché 1 seule fois par session pour ne pas gêner
     if (sessionStorage.getItem('vp_splash_done') === '1') {
-      setShow(false);
-      return;
+      const frame = requestAnimationFrame(() => setShow(false));
+      return () => cancelAnimationFrame(frame);
     }
     const t = setTimeout(() => {
       setShow(false);

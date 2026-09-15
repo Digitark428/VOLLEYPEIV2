@@ -1,17 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Plus, Sparkles } from 'lucide-react';
 import Calendar from '@/components/calendar/Calendar';
 import DayEventsModal from '@/components/calendar/DayEventsModal';
 import StatsTrackers from '@/components/calendar/StatsTrackers';
 import TournamentCard from '@/components/calendar/TournamentCard';
-import PublishForm from '@/components/forms/PublishForm';
-import Button from '@/components/ui/Button';
 import { supabase, type Tournament } from '@/lib/supabase';
 
 export default function HomePage() {
+  const router = useRouter();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,26 +20,20 @@ export default function HomePage() {
   const [selectedEvents, setSelectedEvents] = useState<Tournament[]>([]);
   const [dayOpen, setDayOpen] = useState(false);
 
-  const [publishOpen, setPublishOpen] = useState(false);
-
-  const fetchTournaments = async () => {
-    setLoading(true);
-    const { data } = await supabase
-      .from('tournaments')
-      .select('*')
-      .order('date', { ascending: true });
-    setTournaments(data ?? []);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    fetchTournaments();
+    let active = true;
+    supabase.from('tournaments').select('*').eq('status', 'published').is('deleted_at', null).order('date', { ascending: true }).then(({ data }) => {
+      if (!active) return;
+      setTournaments(data ?? []);
+      setLoading(false);
+    });
+    return () => { active = false; };
   }, []);
 
   const handleDayClick = (date: Date, events: Tournament[]) => {
     if (events.length === 1) {
       // 1 seul tournoi : redirection directe
-      window.location.href = `/tournoi/${events[0].id}`;
+      router.push(`/tournoi/${events[0].id}`);
       return;
     }
     setSelectedDate(date);
@@ -81,10 +76,10 @@ export default function HomePage() {
 
         {/* Bouton principal */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button size="lg" onClick={() => setPublishOpen(true)} className="group">
+          <Link href="/mes-tournois/nouveau" className="group inline-flex items-center gap-2 rounded-xl bg-ink-950 px-6 py-3.5 text-sm font-medium text-white shadow-lift">
             <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
-            Publier un tournoi
-          </Button>
+            Créer un tournoi
+          </Link>
           <a
             href="#calendrier"
             className="text-sm font-medium text-ink-600 hover:text-ink-900 px-4 py-2 transition-colors"
@@ -150,9 +145,9 @@ export default function HomePage() {
         ) : upcoming.length === 0 ? (
           <div className="rounded-3xl bg-white border border-ink-200/60 p-12 text-center">
             <p className="text-ink-500">Aucun tournoi à venir pour le moment.</p>
-            <Button onClick={() => setPublishOpen(true)} className="mt-4" variant="secondary">
+            <Link href="/mes-tournois/nouveau" className="mt-4 inline-flex rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm font-medium">
               Publier le premier
-            </Button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
@@ -169,11 +164,6 @@ export default function HomePage() {
         onClose={() => setDayOpen(false)}
         date={selectedDate}
         tournaments={selectedEvents}
-      />
-      <PublishForm
-        open={publishOpen}
-        onClose={() => setPublishOpen(false)}
-        onPublished={fetchTournaments}
       />
     </div>
   );

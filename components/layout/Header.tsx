@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ShieldCheck } from 'lucide-react';
+import { Menu, X, UserRound } from 'lucide-react';
 import Logo from './Logo';
 import { classNames } from '@/lib/utils';
 
 const nav = [
   { href: '/', label: 'Calendrier' },
+  { href: '/actualite', label: 'Actualité' },
   { href: '/carte', label: 'Carte' },
   { href: '/partenaires', label: 'Partenaires' },
 ];
@@ -25,10 +26,6 @@ export default function Header() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   return (
     <header
@@ -59,6 +56,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setOpen(false)}
                   className={classNames(
                     'relative px-4 py-2 text-sm font-medium transition-colors rounded-full',
                     active
@@ -79,15 +77,15 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Admin desktop */}
+          {/* Compte desktop */}
           <div className="hidden md:flex items-center gap-2">
             <Link
-              href="/admin"
+              href="/profil"
               className="inline-flex items-center gap-1.5 text-xs text-ink-400 hover:text-ink-700 transition-colors px-3 py-2 rounded-full hover:bg-ink-100"
-              aria-label="Admin"
+              aria-label="Mon profil"
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Admin
+              <UserRound className="w-3.5 h-3.5" />
+              Profil
             </Link>
           </div>
 
@@ -129,11 +127,12 @@ export default function Header() {
                 );
               })}
               <Link
-                href="/admin"
+                href="/profil"
+                onClick={() => setOpen(false)}
                 className="px-4 py-3 rounded-xl text-[15px] font-medium text-ink-400 hover:bg-ink-50 flex items-center gap-2 mt-2 border-t border-ink-200/60 pt-4"
               >
-                <ShieldCheck className="w-4 h-4" />
-                Espace admin
+                <UserRound className="w-4 h-4" />
+                Mon profil
               </Link>
             </div>
           </motion.div>

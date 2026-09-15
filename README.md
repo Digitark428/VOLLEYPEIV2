@@ -1,186 +1,65 @@
-# 🏐 Volley Péi
+# VolleyPéi V2
 
-Application web premium dédiée au calendrier des tournois de volley à La Réunion (974).
+Plateforme communautaire du volley à La Réunion : calendrier, associations vérifiées, inscriptions d’équipes, profils joueurs, fil d’actualité et modération.
 
-Les organisateurs publient librement leurs événements dans un calendrier public, élégant et fluide. Inspiration visuelle : Shadow.tech — ambiance claire, minimaliste, premium.
+## Stack
 
----
+- Next.js 16, React 19 et TypeScript
+- Supabase Auth, PostgreSQL, Row Level Security et Storage
+- Tailwind CSS, Framer Motion et React Leaflet
+- Vercel pour le déploiement
 
-## ✨ Stack technique
-
-- **Next.js 14** (App Router) + **TypeScript**
-- **React 18** + **Tailwind CSS**
-- **Supabase** (PostgreSQL + Storage)
-- **Framer Motion** (animations)
-- **React-Leaflet** + OpenStreetMap (carte)
-- **Lucide Icons**
-
----
-
-## 🚀 Installation
-
-### 1. Cloner et installer les dépendances
+## Installation locale
 
 ```bash
 npm install
-```
-
-### 2. Configurer Supabase
-
-1. Créer un projet sur [supabase.com](https://supabase.com)
-2. Dans le **SQL Editor**, exécuter le contenu de `supabase/schema.sql`
-3. Cela crée :
-   - Les tables `tournaments`, `sponsors`, `visits`
-   - Les triggers `updated_at`
-   - Les politiques RLS (lecture publique, insertion publique)
-   - Les buckets storage `posters` et `sponsors` avec leurs policies
-
-### 3. Variables d'environnement
-
-Copier le fichier d'exemple et le remplir :
-
-```bash
 cp .env.local.example .env.local
-```
-
-Remplir avec vos clés Supabase :
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
-NEXT_PUBLIC_PARTNERS_CODE=PARTENAIRES974
-NEXT_PUBLIC_ADMIN_PASSWORD=admin974
-```
-
-### 4. Lancer le dev
-
-```bash
 npm run dev
 ```
 
-L'app est disponible sur [http://localhost:3000](http://localhost:3000).
+Renseigner dans `.env.local` :
 
----
-
-## 🔑 Codes d'accès
-
-| Zone | Code |
-|------|------|
-| Page **Partenaires** (vitrine sponsors) | `PARTENAIRES974` |
-| Page **Admin** (gestion tournois + sponsors) | `admin974` |
-
-> Les codes sont configurables dans `.env.local`.
-
----
-
-## 📁 Architecture
-
-```
-app/
-├── page.tsx              → Calendrier (page d'accueil)
-├── tournoi/[id]/         → Fiche détaillée d'un tournoi
-├── carte/                → Carte OpenStreetMap des tournois
-├── partenaires/          → Vitrine sponsors (protégée)
-├── admin/                → Back-office (protégé)
-└── layout.tsx
-
-components/
-├── layout/               → Header, Footer, SplashScreen, Logo
-├── calendar/             → Calendrier, cards, modal jour, stats
-├── forms/                → Formulaire de publication
-├── map/                  → Carte interactive
-├── sponsors/             → Slots et fiche détaillée
-├── admin/                → AdminTournaments, AdminSponsors
-└── ui/                   → Button, Modal, Input, TypeBadge
-
-lib/
-├── supabase.ts           → Client + types
-└── utils.ts              → Helpers (dates, classNames…)
-
-supabase/
-└── schema.sql            → Schéma complet de la base
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_PARTNERS_CODE=change-me
 ```
 
----
+Le mot de passe partenaire protège seulement l’espace partenaire privé. L’administration utilise exclusivement Supabase Auth et la liste d’administrateurs en base — jamais un mot de passe public côté navigateur.
 
-## 🎨 Design system
-
-- **Palette ink** : zinc (gris doux) du 50 au 950
-- **Accents Réunion** : bleu `#1E40AF`, jaune `#F59E0B`, rouge `#DC2626`
-- **Typographie** : Inter (texte) + Space Grotesk (titres)
-- **Ombres premium** : `soft`, `card`, `lift`, `premium`
-- **Effets** : glass blur, shimmer, halo lumineux du splash
-
----
-
-## 📋 Fonctionnalités
-
-### Public
-
-- ✅ Splash screen premium (logo animé)
-- ✅ Calendrier mensuel avec pastilles tournois
-- ✅ Publication libre via formulaire (avec popup d'avertissement + confirmation)
-- ✅ Fiche détaillée par tournoi (affiche, infos, contacts, partage)
-- ✅ Section "Prochains tournois"
-- ✅ Trackers visites jour/mois + tournois du mois
-- ✅ Carte OpenStreetMap avec pins automatiques
-- ✅ Responsive mobile-first
-
-### Partenaires (code requis)
-
-- ✅ 1 emplacement Gold (au-dessus du calendrier)
-- ✅ 6 emplacements Silver (sous le calendrier)
-- ✅ 8 emplacements Bronze (en bas)
-- ✅ Fiche sponsor détaillée avec galerie
-- ✅ **Côté public, les sponsors n'apparaissent pas tant qu'aucun n'existe**
-
-### Admin (mot de passe requis)
-
-- ✅ Gestion tournois : recherche, édition, suppression, ajout de coordonnées GPS
-- ✅ Gestion sponsors : CRUD complet, upload image principale + galerie (jusqu'à 10 photos), catégorisation
-
----
-
-## 🔔 Notifications (préparé pour le futur)
-
-L'architecture est en place dans `lib/notifications/` :
-
-- **`types.ts`** — types `NotificationType`, `NotificationPayload`, `NotificationPreferences`
-- **`index.ts`** — API publique (`sendNotification`, `scheduleNotification`, helpers de payloads)
-- **`supabase/notifications.sql`** — schéma DB à activer le moment venu (tables `notifications` + `notification_subscriptions`)
-
-Les hooks sont déjà branchés (ex. `PublishForm` appelle `sendNotification` après publication d'un tournoi). Aujourd'hui ce sont des **stubs** (no-op + log en dev). Pour activer plus tard :
-
-1. Exécuter `supabase/notifications.sql` dans Supabase
-2. Implémenter le service worker pour push web (VAPID)
-3. Ajouter un service email si besoin (Resend, SendGrid…)
-4. Remplir le corps des fonctions dans `lib/notifications/index.ts`
-
-L'API ne change pas — aucun refactor à faire dans le reste du code.
-
----
-
-## 🛠 Production
+## Commandes utiles
 
 ```bash
+npm run lint
+npm run typecheck
+npm test
 npm run build
-npm start
+npm run check
 ```
 
-Déployable directement sur **Vercel** (recommandé) ou tout hébergeur Node.
+Une sauvegarde des données de production peut être créée avec :
 
----
+```bash
+node scripts/backup-production.mjs
+```
 
-## 🔒 Sécurité
+## Fonctionnement
 
-- Page admin et partenaires protégées côté UI via `sessionStorage`
-- Politiques RLS Supabase : lecture publique, insertion publique (pour la publication libre)
-- Les opérations admin sont conditionnées par la session UI
+- Toute personne peut consulter le calendrier, les fiches publiques et l’actualité.
+- Un compte avec pseudo, e-mail et mot de passe est requis pour participer, aimer, commenter ou inscrire une équipe.
+- Les noms réels d’un joueur restent privés sauf choix explicite du joueur.
+- Un mineur doit renseigner son responsable légal et obtenir sa confirmation par lien sécurisé.
+- Une association doit transmettre ses informations, puis être approuvée par VolleyPéi avant de créer un tournoi.
+- Le compte `kevin@digit-ark.com` devient administrateur après création et confirmation de son compte.
+- Les images sont converties en WebP, redimensionnées et débarrassées de leurs métadonnées avant envoi.
 
-> Pour un usage production à grande échelle, envisager une **vraie authentification Supabase Auth** + des policies RLS plus strictes sur `update`/`delete`.
+## Supabase
 
----
+Le schéma V2 est versionné dans `supabase/migrations/`. Toute modification de base doit passer par une nouvelle migration. Les tables exposées utilisent RLS et les opérations sensibles sont protégées par l’identité Supabase et les rôles stockés en base.
 
-## 📞 Support
+Les anciens fichiers `supabase/schema.sql` et `supabase/notifications.sql` documentent la V1 ; ils ne doivent pas être rejoués sur la production V2.
 
-Projet créé pour la communauté volley de La Réunion 🇷🇪
+## Déploiement
+
+Le dépôt GitHub est relié au projet Vercel. Les branches produisent des aperçus, et la branche principale produit le site public après validation. Les variables Supabase doivent être présentes dans les environnements Preview et Production de Vercel.

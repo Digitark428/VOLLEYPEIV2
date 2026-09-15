@@ -46,7 +46,7 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 border-t border-ink-200/60 flex flex-col sm:flex-row justify-between gap-2 text-xs text-ink-400">
           <p>© {year} Volley Péi. Tous droits réservés.</p>
-          <p>Données vérifiées par l'équipe éditoriale.</p>
+          <p>Données vérifiées par l&apos;équipe éditoriale.</p>
         </div>
       </div>
     </footer>

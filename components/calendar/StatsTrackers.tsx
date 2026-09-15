@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, CalendarDays, Trophy } from 'lucide-react';
+import { Eye, CalendarDays, Trophy, UserRound, Building2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Stats {
+  players: number;
+  associations: number;
+  tournaments: number;
   visitsToday: number;
   visitsMonth: number;
   tournamentsMonth: number;
@@ -13,6 +16,9 @@ interface Stats {
 
 export default function StatsTrackers() {
   const [stats, setStats] = useState<Stats>({
+    players: 0,
+    associations: 0,
+    tournaments: 0,
     visitsToday: 0,
     visitsMonth: 0,
     tournamentsMonth: 0,
@@ -21,37 +27,39 @@ export default function StatsTrackers() {
 
   useEffect(() => {
     (async () => {
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-
-      const [todayRes, monthRes, tournRes] = await Promise.all([
-        supabase
-          .from('visits')
-          .select('*', { count: 'exact', head: true })
-          .gte('visited_at', startOfDay.toISOString()),
-        supabase
-          .from('visits')
-          .select('*', { count: 'exact', head: true })
-          .gte('visited_at', startOfMonth.toISOString()),
-        supabase
-          .from('tournaments')
-          .select('*', { count: 'exact', head: true })
-          .gte('created_at', startOfMonth.toISOString())
-          .lte('created_at', endOfMonth.toISOString()),
-      ]);
-
+      const { data } = await supabase.rpc('get_public_stats');
+      const row = Array.isArray(data) ? data[0] : data;
       setStats({
-        visitsToday: todayRes.count ?? 0,
-        visitsMonth: monthRes.count ?? 0,
-        tournamentsMonth: tournRes.count ?? 0,
+        players: Number(row?.players ?? 0),
+        associations: Number(row?.associations ?? 0),
+        tournaments: Number(row?.tournaments ?? 0),
+        visitsToday: Number(row?.visits_today ?? 0),
+        visitsMonth: Number(row?.visits_month ?? 0),
+        tournamentsMonth: Number(row?.tournaments_this_month ?? 0),
       });
       setLoaded(true);
     })();
   }, []);
 
   const items = [
+    {
+      label: 'Joueurs inscrits',
+      value: stats.players,
+      icon: UserRound,
+      accent: 'bg-emerald-500/10 text-emerald-700',
+    },
+    {
+      label: 'Associations',
+      value: stats.associations,
+      icon: Building2,
+      accent: 'bg-violet-500/10 text-violet-700',
+    },
+    {
+      label: 'Tournois créés',
+      value: stats.tournaments,
+      icon: Trophy,
+      accent: 'bg-reunion-red/10 text-reunion-red',
+    },
     {
       label: 'Visites du jour',
       value: stats.visitsToday,
@@ -64,16 +72,10 @@ export default function StatsTrackers() {
       icon: CalendarDays,
       accent: 'bg-reunion-yellow/10 text-amber-700',
     },
-    {
-      label: 'Tournois ce mois-ci',
-      value: stats.tournamentsMonth,
-      icon: Trophy,
-      accent: 'bg-reunion-red/10 text-reunion-red',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:gap-4">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
       {items.map((item, i) => (
         <motion.div
           key={item.label}

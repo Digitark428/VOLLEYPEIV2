@@ -148,7 +148,7 @@ export default function Calendar({ tournaments, onDayClick }: Props) {
 
         {/* Grille */}
         <div className="grid grid-cols-7 px-2 sm:px-3 pb-3 gap-1 sm:gap-1.5">
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             {weeks.flat().map((day, idx) => {
               const key = `${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`;
               const dayEvents = eventsByDay.get(key) ?? [];

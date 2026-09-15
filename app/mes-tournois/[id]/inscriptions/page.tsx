@@ -1,0 +1,25 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ArrowLeft, Search, UsersRound } from 'lucide-react';
+import { requireIdentity } from '@/lib/auth';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+
+type Registration = { id: string; team_name: string; referent_email: string; referent_phone: string; category: string | null; level: string | null; status: string; created_at: string; players: { id: string; first_name: string; last_name: string; is_minor: boolean; guardian_consent: string }[] };
+
+export default async function TournamentRegistrationsPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ q?: string }> }) {
+  const [{ id }, query, identity] = await Promise.all([params, searchParams, requireIdentity('/connexion')]);
+  const supabase = await createServerSupabaseClient();
+  const { data: tournament } = await supabase.from('tournaments').select('id, name, association_id').eq('id', id).is('deleted_at', null).maybeSingle();
+  if (!tournament) notFound();
+  const { data: membership } = await supabase.from('association_members').select('id').eq('association_id', tournament.association_id).eq('user_id', identity.id).eq('status', 'active').in('role', ['owner', 'admin']).maybeSingle();
+  if (!membership && !identity.isAdmin) notFound();
+  let request = supabase.from('tournament_registrations').select('id, team_name, referent_email, referent_phone, category, level, status, created_at, players:registration_players(id, first_name, last_name, is_minor, guardian_consent)').eq('tournament_id', id).order('created_at', { ascending: false });
+  if (query.q?.trim()) request = request.ilike('team_name', `%${query.q.trim()}%`);
+  const { data, error } = await request;
+  const registrations = (data ?? []) as unknown as Registration[];
+
+  return <section className="px-4 py-10 sm:py-14"><div className="mx-auto max-w-7xl"><Link href="/mes-tournois" className="inline-flex items-center gap-2 text-sm text-ink-500"><ArrowLeft className="h-4 w-4" /> Mes tournois</Link><div className="mt-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-reunion-blue">Inscriptions officielles</p><h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">{tournament.name}</h1><p className="mt-2 inline-flex items-center gap-2 text-sm text-ink-500"><UsersRound className="h-4 w-4" /> {registrations.length} équipe{registrations.length > 1 ? 's' : ''}</p></div><form className="flex gap-2"><label className="relative"><span className="sr-only">Rechercher une équipe</span><Search className="absolute left-3 top-3 h-4 w-4 text-ink-400" /><input name="q" defaultValue={query.q ?? ''} placeholder="Rechercher une équipe" className="rounded-xl border border-ink-200 bg-white py-2.5 pl-9 pr-4 text-sm" /></label><button className="rounded-xl bg-ink-950 px-4 py-2.5 text-sm font-medium text-white">Chercher</button></form></div>
+    {error && <p className="mt-6 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error.message}</p>}
+    <div className="mt-7 overflow-x-auto rounded-2xl border border-ink-200 bg-white shadow-soft"><table className="min-w-full text-left text-sm"><thead className="bg-ink-50 text-xs uppercase tracking-wider text-ink-400"><tr><th className="px-5 py-4">Équipe</th><th className="px-5 py-4">Joueurs</th><th className="px-5 py-4">Référent</th><th className="px-5 py-4">Statut</th><th className="px-5 py-4">Date</th></tr></thead><tbody className="divide-y divide-ink-100">{registrations.map((registration) => <tr key={registration.id} className="align-top"><td className="px-5 py-4"><p className="font-semibold">{registration.team_name}</p><p className="mt-1 text-xs text-ink-400">{[registration.category, registration.level].filter(Boolean).join(' · ') || 'Sans catégorie'}</p></td><td className="px-5 py-4"><ul className="space-y-1">{registration.players.map((player) => <li key={player.id}>{player.first_name} {player.last_name}{player.is_minor && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] text-amber-800">Mineur · {player.guardian_consent}</span>}</li>)}</ul></td><td className="px-5 py-4"><a href={`mailto:${registration.referent_email}`} className="block text-reunion-blue">{registration.referent_email}</a><a href={`tel:${registration.referent_phone}`} className="mt-1 block text-ink-500">{registration.referent_phone}</a></td><td className="px-5 py-4"><span className="rounded-full bg-ink-100 px-2.5 py-1 text-xs font-medium">{registration.status}</span></td><td className="whitespace-nowrap px-5 py-4 text-ink-500">{new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Indian/Reunion' }).format(new Date(registration.created_at))}</td></tr>)}</tbody></table>{registrations.length === 0 && <p className="p-8 text-center text-sm text-ink-500">Aucune inscription trouvée.</p>}</div>
+  </div></section>;
+}
