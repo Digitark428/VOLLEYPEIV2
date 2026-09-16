@@ -61,16 +61,31 @@ export async function createAssociation(formData: FormData) {
 }
 
 export async function updateAssociation(formData: FormData) {
-  await requireIdentity('/connexion');
+  const identity = await requireIdentity('/connexion');
   const associationId = value(formData, 'association_id');
   if (!associationId) redirect('/mon-association?erreur=Association%20introuvable.');
 
   const supabase = await createServerSupabaseClient();
+  const { data: membership } = await supabase.from('association_members').select('role').eq('association_id', associationId).eq('user_id', identity.id).eq('status', 'active').in('role', ['owner', 'admin']).maybeSingle();
+  if (!membership) redirect('/mon-association?erreur=Vous%20ne%20pouvez%20pas%20modifier%20cette%20association.');
+
+  const logoMediaId = value(formData, 'logo_media_id');
+  let logoPath: string | undefined;
+  if (logoMediaId) {
+    const { data: logo } = await supabase.from('media_assets').select('storage_path').eq('id', logoMediaId).eq('owner_id', identity.id).eq('association_id', associationId).eq('kind', 'logo').is('deleted_at', null).maybeSingle();
+    if (!logo) redirect(`/mon-association/${associationId}/modifier?erreur=Logo%20introuvable.`);
+    logoPath = logo.storage_path;
+  }
+
+  const name = value(formData, 'name') ?? '';
+  const email = value(formData, 'email')?.toLowerCase() ?? '';
+  if (name.length < 2 || !/^\S+@\S+\.\S+$/.test(email)) redirect(`/mon-association/${associationId}/modifier?erreur=Vérifie%20les%20informations%20obligatoires.`);
+
   const { error } = await supabase
     .from('associations')
     .update({
-      name: value(formData, 'name'),
-      email: value(formData, 'email')?.toLowerCase(),
+      name,
+      email,
       phone: value(formData, 'phone'),
       description: value(formData, 'description'),
       address: value(formData, 'address'),
@@ -79,10 +94,14 @@ export async function updateAssociation(formData: FormData) {
       website: value(formData, 'website'),
       instagram_url: value(formData, 'instagram_url'),
       facebook_url: value(formData, 'facebook_url'),
+      ...(logoPath ? { logo_path: logoPath } : {}),
     })
-    .eq('id', associationId);
+    .eq('id', associationId)
+    .select('slug')
+    .single();
 
-  if (error) redirect(`/mon-association?erreur=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`/mon-association/${associationId}/modifier?erreur=${encodeURIComponent(error.message)}`);
   revalidatePath('/mon-association');
+  revalidatePath('/associations', 'layout');
   redirect('/mon-association?message=Association%20mise%20à%20jour.');
 }
