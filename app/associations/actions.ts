@@ -105,3 +105,16 @@ export async function updateAssociation(formData: FormData) {
   revalidatePath('/associations', 'layout');
   redirect('/mon-association?message=Association%20mise%20à%20jour.');
 }
+
+export async function deleteManagedAssociation(formData: FormData) {
+  const identity = await requireIdentity('/connexion?retour=/mon-association');
+  const associationId = value(formData, 'association_id');
+  if (!associationId) redirect('/mon-association?erreur=Association%20introuvable.');
+  const supabase = await createServerSupabaseClient();
+  const { data: membership } = await supabase.from('association_members').select('id').eq('association_id', associationId).eq('user_id', identity.id).eq('status', 'active').eq('role', 'owner').maybeSingle();
+  if (!membership) redirect('/mon-association?erreur=Seul%20le%20propriétaire%20peut%20supprimer%20cette%20association.');
+  const { error } = await supabase.from('associations').update({ deleted_at: new Date().toISOString(), status: 'suspended' }).eq('id', associationId).select('id').single();
+  if (error) redirect(`/mon-association?erreur=${encodeURIComponent(error.message)}`);
+  revalidatePath('/mon-association'); revalidatePath('/admin/associations'); revalidatePath('/', 'layout');
+  redirect('/mon-association?message=Association%20supprimée.');
+}

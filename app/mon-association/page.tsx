@@ -3,6 +3,8 @@ import { Building2, Clock3, ShieldCheck, Trophy } from 'lucide-react';
 import AuthNotice from '@/components/auth/AuthNotice';
 import { requireIdentity } from '@/lib/auth';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import ConfirmButton from '@/components/forms/ConfirmButton';
+import { deleteManagedAssociation } from '@/app/associations/actions';
 
 type AssociationMembership = {
   role: 'owner' | 'admin' | 'member';
@@ -27,6 +29,7 @@ export default async function MyAssociationPage({ searchParams }: { searchParams
     .select('role, associations(id, slug, name, description, city, status, review_note)')
     .eq('user_id', identity.id)
     .eq('status', 'active')
+    .is('associations.deleted_at', null)
     .order('created_at', { ascending: true });
   const memberships = (data ?? []) as unknown as AssociationMembership[];
 
@@ -56,6 +59,7 @@ export default async function MyAssociationPage({ searchParams }: { searchParams
               <div className="mt-6 flex flex-wrap gap-3">
                 {role !== 'member' && <Link href={`/mon-association/${association.id}/modifier`} className="rounded-xl border border-ink-200 px-4 py-2.5 text-sm font-medium">Modifier l’association</Link>}
                 {association.status === 'approved' ? <><Link href={`/associations/${association.slug}`} className="rounded-xl border border-ink-200 px-4 py-2.5 text-sm font-medium">Voir la page publique</Link>{role !== 'member' && <Link href={`/mon-association/${association.id}/membres`} className="rounded-xl border border-ink-200 px-4 py-2.5 text-sm font-medium">Gérer les membres</Link>}<Link href="/mes-tournois" className="inline-flex items-center gap-2 rounded-xl bg-ink-950 px-4 py-2.5 text-sm font-medium text-white"><Trophy className="h-4 w-4" /> Mes tournois</Link></> : <span className="inline-flex items-center gap-2 text-sm text-ink-500"><Clock3 className="h-4 w-4" /> La création de tournoi sera activée après validation.</span>}
+                {role === 'owner' && <form action={deleteManagedAssociation}><input type="hidden" name="association_id" value={association.id} /><ConfirmButton message={`Supprimer l’association ${association.name} ? Elle disparaîtra de toutes les listes.`} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-medium text-red-700">Supprimer l’association</ConfirmButton></form>}
               </div>
             </article>
           ) : null;

@@ -72,6 +72,21 @@ export async function createTournament(formData: FormData) {
   redirect(`/tournoi/${tournament.id}?message=Tournoi%20publié.`);
 }
 
+export async function deleteManagedTournament(formData: FormData) {
+  const identity = await requireIdentity('/connexion?retour=/mes-tournois');
+  const tournamentId = value(formData, 'tournament_id');
+  if (!tournamentId) redirect('/mes-tournois?erreur=Tournoi%20introuvable.');
+  const supabase = await createServerSupabaseClient();
+  const { data: tournament } = await supabase.from('tournaments').select('association_id').eq('id', tournamentId).is('deleted_at', null).maybeSingle();
+  if (!tournament) redirect('/mes-tournois?erreur=Tournoi%20introuvable.');
+  const { data: membership } = await supabase.from('association_members').select('id').eq('association_id', tournament.association_id).eq('user_id', identity.id).eq('status', 'active').in('role', ['owner', 'admin']).maybeSingle();
+  if (!membership) redirect('/mes-tournois?erreur=Accès%20refusé.');
+  const { error } = await supabase.from('tournaments').update({ deleted_at: new Date().toISOString(), status: 'hidden' }).eq('id', tournamentId).select('id').single();
+  if (error) redirect(`/mes-tournois?erreur=${encodeURIComponent(error.message)}`);
+  revalidatePath('/'); revalidatePath('/mes-tournois'); revalidatePath('/admin/tournois');
+  redirect('/mes-tournois?message=Tournoi%20supprimé.');
+}
+
 export async function reviewResultClaim(formData: FormData) {
   const identity = await requireIdentity();
   const tournamentId = value(formData, 'tournament_id');
