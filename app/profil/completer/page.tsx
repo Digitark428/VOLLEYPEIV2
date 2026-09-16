@@ -25,7 +25,7 @@ export default async function CompleteProfilePage({ searchParams }: { searchPara
           <form action={updateProfile} className="space-y-6">
             <div><p className="mb-2 text-sm font-medium">Photo de profil</p><OptimizedMediaPicker usage="avatar" inputName="avatar_media_id" /></div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-medium">Pseudo<input name="username" defaultValue={profile?.username ?? ''} required className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
+              <label className="text-sm font-medium">Pseudo <span className="text-red-600">* obligatoire</span><input name="username" defaultValue={profile?.username ?? ''} required minLength={3} maxLength={30} pattern="[A-Za-z0-9._-]+" title="3 à 30 caractères : lettres, chiffres, point, tiret ou tiret bas" className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
               <label className="text-sm font-medium">Date de naissance<input name="birth_date" type="date" defaultValue={privateProfile?.birth_date ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
               <label className="text-sm font-medium">Prénom<input name="first_name" defaultValue={profile?.first_name ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
               <label className="text-sm font-medium">Nom<input name="last_name" defaultValue={profile?.last_name ?? ''} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>

@@ -10,14 +10,14 @@ export default async function NewAssociationPage({ searchParams }: { searchParam
       <div className="mx-auto max-w-2xl">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-reunion-blue">Association</p>
         <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">Rejoindre VolleyPéi</h1>
-        <p className="mt-3 text-sm leading-6 text-ink-500">Complète la fiche. Elle sera examinée par VolleyPéi avant de devenir publique et de pouvoir créer des tournois.</p>
+        <p className="mt-3 text-sm leading-6 text-ink-500">Seuls le nom, l’e-mail officiel et la certification sont obligatoires. Tout le reste peut être complété plus tard.</p>
         <form action={createAssociation} className="mt-8 space-y-5 rounded-3xl border border-ink-200 bg-white p-6 shadow-card sm:p-8">
           <AuthNotice error={params.erreur} />
           <div><p className="mb-2 text-sm font-medium">Logo</p><OptimizedMediaPicker usage="logo" inputName="logo_media_id" /></div>
-          <label className="block text-sm font-medium">Nom de l’association<input name="name" required minLength={2} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
+          <label className="block text-sm font-medium">Nom de l’association <span className="text-red-600">* obligatoire</span><input name="name" required minLength={2} className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
           <label className="block text-sm font-medium">Présentation<textarea name="description" rows={5} maxLength={3000} className="mt-2 w-full resize-none rounded-xl border border-ink-200 px-4 py-3" /></label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="text-sm font-medium">E-mail officiel<input name="email" type="email" required className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
+            <label className="text-sm font-medium">E-mail officiel <span className="text-red-600">* obligatoire</span><input name="email" type="email" required className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
             <label className="text-sm font-medium">Téléphone<input name="phone" type="tel" className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
             <label className="text-sm font-medium">Adresse<input name="address" className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
             <label className="text-sm font-medium">Commune<input name="city" className="mt-2 w-full rounded-xl border border-ink-200 px-4 py-3" /></label>
