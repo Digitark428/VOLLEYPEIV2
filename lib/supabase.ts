@@ -39,6 +39,7 @@ export interface Tournament {
   latitude?: number | null;
   longitude?: number | null;
   views_count?: number;
+  likes?: { profile_id: string }[];
   association_id?: string | null;
   created_by?: string | null;
   slug?: string | null;

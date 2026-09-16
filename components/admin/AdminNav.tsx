@@ -8,6 +8,7 @@ const links = [
   ['Modération', '/admin/moderation'],
   ['Inscriptions', '/admin/inscriptions'],
   ['Statistiques', '/admin/statistiques'],
+  ['Apparence', '/admin/apparence'],
 ] as const;
 
 export default function AdminNav() {

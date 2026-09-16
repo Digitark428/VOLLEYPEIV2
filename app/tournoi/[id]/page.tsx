@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Calendar, Clock, Eye, Heart, Mail, MapPin, MessageCircle, Phone, UserRoundCheck, Users } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Eye, Heart, Mail, MapPin, MessageCircle, Phone, Users } from 'lucide-react';
 import AuthNotice from '@/components/auth/AuthNotice';
 import FeedPostCard from '@/components/feed/FeedPostCard';
 import ProfileAvatar from '@/components/profile/ProfileAvatar';
@@ -15,7 +15,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { protectedMediaUrl } from '@/lib/media';
 import { FEED_SELECT, type FeedPost } from '@/lib/feed';
 import { formatDate, formatTime } from '@/lib/utils';
-import { addTournamentComment, deleteTournamentComment, submitResultClaim, submitTournamentRegistration, toggleParticipation, toggleTournamentLike } from './actions';
+import { addTournamentComment, deleteTournamentComment, submitResultClaim, submitTournamentRegistration, toggleTournamentLike } from './actions';
 
 type Profile = { id: string; username: string | null; first_name: string | null; last_name: string | null; show_real_name: boolean; avatar_path: string | null };
 type Comment = { id: string; author_id: string; body: string; created_at: string; author: Profile | Profile[] | null };
@@ -77,7 +77,6 @@ export default async function TournamentPage({ params, searchParams }: { params:
           <section><div className="flex flex-wrap items-center gap-2"><TypeBadge type={tournament.type} />{new Date(tournament.date) < new Date(new Date().toDateString()) && <span className="rounded-full bg-ink-100 px-3 py-1 text-xs font-semibold text-ink-500">Archive</span>}</div><h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">{tournament.name}</h1><p className="mt-3 text-[15px] leading-6 text-ink-500">{tournament.location}{tournament.address ? ` · ${tournament.address}` : ''}</p>{association && <Link href={`/associations/${association.slug}`} className="mt-3 inline-flex text-sm font-semibold text-reunion-blue">Organisé par {association.name} →</Link>}</section>
           <div className="grid grid-cols-2 gap-3">{info.map(([Icon, label, shownValue]) => <div key={label} className="rounded-2xl border border-ink-200 bg-white p-4 shadow-soft"><span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-400"><Icon className="h-3.5 w-3.5" />{label}</span><p className="mt-2 text-sm font-semibold">{shownValue}</p></div>)}</div>
           <div className="flex flex-wrap gap-2">
-            <form action={toggleParticipation}><input type="hidden" name="tournament_id" value={tournament.id} /><button className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold ${participates ? 'bg-emerald-600 text-white' : 'bg-ink-950 text-white'}`}><UserRoundCheck className="h-4 w-4" />Je participe · {tournament.participants.length}</button></form>
             <form action={toggleTournamentLike}><input type="hidden" name="tournament_id" value={tournament.id} /><button className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold ${liked ? 'border-red-200 bg-red-50 text-red-600' : 'border-ink-200 bg-white text-ink-600'}`}><Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} /> {tournament.likes.length || 'J’aime'}</button></form>
           </div>
           <section className="rounded-3xl border border-ink-200 bg-white p-6 shadow-soft"><h2 className="font-display text-xl font-semibold">À propos du tournoi</h2><p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-ink-600">{tournament.description}</p>{tournament.additional_info && <p className="mt-4 border-t border-ink-100 pt-4 text-sm leading-6 text-ink-500">{tournament.additional_info}</p>}</section>

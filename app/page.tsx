@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Plus, Sparkles } from 'lucide-react';
 import Calendar from '@/components/calendar/Calendar';
@@ -12,7 +11,6 @@ import TournamentCard from '@/components/calendar/TournamentCard';
 import { supabase, type Tournament } from '@/lib/supabase';
 
 export default function HomePage() {
-  const router = useRouter();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +20,7 @@ export default function HomePage() {
 
   useEffect(() => {
     let active = true;
-    supabase.from('tournaments').select('*').eq('status', 'published').is('deleted_at', null).order('date', { ascending: true }).then(({ data }) => {
+    supabase.from('tournaments').select('*, likes:tournament_likes(profile_id)').eq('status', 'published').is('deleted_at', null).order('date', { ascending: true }).then(({ data }) => {
       if (!active) return;
       setTournaments(data ?? []);
       setLoading(false);
@@ -31,11 +29,6 @@ export default function HomePage() {
   }, []);
 
   const handleDayClick = (date: Date, events: Tournament[]) => {
-    if (events.length === 1) {
-      // 1 seul tournoi : redirection directe
-      router.push(`/tournoi/${events[0].id}`);
-      return;
-    }
     setSelectedDate(date);
     setSelectedEvents(events);
     setDayOpen(true);

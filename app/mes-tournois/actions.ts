@@ -13,6 +13,7 @@ export async function createTournament(formData: FormData) {
   const identity = await requireIdentity('/connexion?retour=/mes-tournois/nouveau');
   const associationId = value(formData, 'association_id');
   const posterMediaId = value(formData, 'poster_media_id');
+  const creationToken = value(formData, 'creation_token');
   const name = value(formData, 'name');
   const date = value(formData, 'date');
   const time = value(formData, 'time');
@@ -20,7 +21,7 @@ export async function createTournament(formData: FormData) {
   const type = value(formData, 'type');
   const location = value(formData, 'location');
   const playersCount = Number.parseInt(value(formData, 'players_count'), 10);
-  if (!associationId || !posterMediaId || name.length < 2 || !date || !time || !city || !type || !location || !Number.isFinite(playersCount) || playersCount < 1) createError('Vérifie tous les champs obligatoires et ajoute une affiche.');
+  if (!associationId || !posterMediaId || !/^[0-9a-f-]{36}$/i.test(creationToken) || name.length < 2 || !date || !time || !city || !type || !location || !Number.isFinite(playersCount) || playersCount < 1) createError('Vérifie tous les champs obligatoires, sélectionne une adresse et ajoute une affiche.');
 
   const supabase = await createServerSupabaseClient();
   const [{ data: membership }, { data: association }, { data: media }] = await Promise.all([
@@ -36,6 +37,7 @@ export async function createTournament(formData: FormData) {
   const { data: tournament, error } = await supabase.from('tournaments').insert({
     association_id: associationId,
     created_by: identity.id,
+    creation_token: creationToken,
     poster_media_id: posterMediaId,
     poster_url: posterUrl,
     slug: `${slugify(name) || 'tournoi'}-${crypto.randomUUID().slice(0, 6)}`,
@@ -59,6 +61,10 @@ export async function createTournament(formData: FormData) {
     registration_deadline: deadline,
     max_teams: Number(value(formData, 'max_teams')) || null,
   }).select('id').single();
+  if (error?.code === '23505') {
+    const { data: existing } = await supabase.from('tournaments').select('id').eq('association_id', associationId).eq('created_by', identity.id).eq('creation_token', creationToken).maybeSingle();
+    if (existing) redirect(`/tournoi/${existing.id}?message=Tournoi%20déjà%20créé.`);
+  }
   if (error || !tournament) createError(error?.message ?? 'Impossible de créer le tournoi.');
   await supabase.from('media_assets').update({ association_id: associationId }).eq('id', posterMediaId);
   revalidatePath('/');

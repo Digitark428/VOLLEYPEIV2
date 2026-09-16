@@ -34,6 +34,29 @@ export async function createPost(formData: FormData) {
   }).select('id').single();
 
   if (error) feedError(error.message);
+  if (post) {
+    const hashtags = [...new Set(Array.from(body.matchAll(/#([A-Za-z0-9_]{2,50})/g), (match) => match[1].toLowerCase()))].slice(0, 20);
+    const usernames = [...new Set(Array.from(body.matchAll(/@([A-Za-z0-9._-]{3,30})/g), (match) => match[1]))].slice(0, 20);
+    if (hashtags.length) {
+      const { error: hashtagError } = await supabase.from('post_hashtags').insert(hashtags.map((tag) => ({ post_id: post.id, tag })));
+      if (hashtagError) {
+        await supabase.from('posts').update({ deleted_at: new Date().toISOString() }).eq('id', post.id);
+        feedError(`Impossible de publier les hashtags : ${hashtagError.message}`);
+      }
+    }
+    if (usernames.length) {
+      const filters = usernames.map((username) => `username.ilike.${username}`).join(',');
+      const { data: mentionedProfiles } = await supabase.from('profiles').select('id').or(filters).eq('status', 'active').is('deleted_at', null);
+      const mentionedIds = [...new Set((mentionedProfiles ?? []).map((profile) => profile.id))].filter((id) => id !== identity.id);
+      if (mentionedIds.length) {
+        const { error: mentionError } = await supabase.from('post_mentions').insert(mentionedIds.map((mentioned_profile_id) => ({ post_id: post.id, mentioned_profile_id, mentioning_profile_id: identity.id })));
+        if (mentionError) {
+          await supabase.from('posts').update({ deleted_at: new Date().toISOString() }).eq('id', post.id);
+          feedError(`Impossible de publier les mentions : ${mentionError.message}`);
+        }
+      }
+    }
+  }
   if (mediaIds.length && post) {
     const { error: mediaError } = await supabase.from('post_media').insert(
       mediaIds.map((mediaId, index) => ({ post_id: post.id, media_id: mediaId, display_order: index + 1 }))

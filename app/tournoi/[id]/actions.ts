@@ -13,7 +13,7 @@ function tournamentError(tournamentId: string, message: string): never {
   redirect(`/tournoi/${tournamentId}?erreur=${encodeURIComponent(message)}`);
 }
 
-async function toggleRelation(table: 'tournament_participants' | 'tournament_likes', formData: FormData) {
+async function toggleRelation(table: 'tournament_likes', formData: FormData) {
   const tournamentId = value(formData, 'tournament_id');
   const identity = await requireIdentity(`/connexion?retour=/tournoi/${tournamentId}`);
   if (!tournamentId) tournamentError(tournamentId, 'Tournoi introuvable.');
@@ -27,7 +27,6 @@ async function toggleRelation(table: 'tournament_participants' | 'tournament_lik
   revalidatePath(`/tournoi/${tournamentId}`);
 }
 
-export async function toggleParticipation(formData: FormData) { return toggleRelation('tournament_participants', formData); }
 export async function toggleTournamentLike(formData: FormData) { return toggleRelation('tournament_likes', formData); }
 
 export async function addTournamentComment(formData: FormData) {

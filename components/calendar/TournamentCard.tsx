@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Clock, Users } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Heart, Eye } from 'lucide-react';
 import type { Tournament } from '@/lib/supabase';
 import TypeBadge from '@/components/ui/TypeBadge';
 import { formatDate, formatTime } from '@/lib/utils';
@@ -69,6 +69,7 @@ export default function TournamentCard({ tournament: t, index = 0 }: Props) {
               {t.players_count} équipes
             </p>
           </div>
+          <div className="mt-3 flex items-center gap-4 border-t border-ink-100 pt-3 text-xs font-semibold text-ink-500"><span className="inline-flex items-center gap-1.5"><Heart className="h-3.5 w-3.5" />{t.likes?.length ?? 0}</span><span className="inline-flex items-center gap-1.5"><Eye className="h-3.5 w-3.5" />{t.views_count ?? 0}</span></div>
         </div>
       </Link>
     </motion.div>

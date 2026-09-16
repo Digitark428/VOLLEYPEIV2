@@ -6,7 +6,7 @@ import TypeBadge from '@/components/ui/TypeBadge';
 import { formatDate, formatTime } from '@/lib/utils';
 import type { Tournament } from '@/lib/supabase';
 import { protectedMediaUrl } from '@/lib/media';
-import { MapPin, Clock, ArrowRight } from 'lucide-react';
+import { MapPin, Clock, ArrowRight, Heart, Eye } from 'lucide-react';
 
 interface Props {
   open: boolean;
@@ -64,6 +64,7 @@ export default function DayEventsModal({ open, onClose, date, tournaments }: Pro
                   <MapPin className="w-3 h-3 flex-shrink-0" />
                   <span className="truncate">{t.city}</span>
                 </span>
+                <span className="inline-flex items-center gap-1"><Heart className="h-3 w-3" />{t.likes?.length ?? 0}</span><span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" />{t.views_count ?? 0}</span>
               </div>
             </div>
           </Link>

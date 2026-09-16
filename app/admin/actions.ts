@@ -155,3 +155,17 @@ export async function deleteTournamentAdmin(formData: FormData) {
   if (error) redirect(`/admin/tournois/${id}?erreur=${encodeURIComponent(error.message)}`);
   revalidatePath('/admin/tournois'); redirect('/admin/tournois?message=Tournoi%20supprimé%20sans%20effacer%20les%20données%20liées.');
 }
+
+export async function updateAppLogo(formData: FormData) {
+  const admin = await requireAdmin();
+  const mediaId = field(formData, 'logo_media_id');
+  if (!mediaId) redirect('/admin/apparence?erreur=Choisis%20un%20logo.');
+  const supabase = await createServerSupabaseClient();
+  const { data: media, error: mediaError } = await supabase.from('media_assets').select('bucket_id, storage_path').eq('id', mediaId).eq('owner_id', admin.id).eq('kind', 'logo').eq('bucket_id', 'branding').is('deleted_at', null).maybeSingle();
+  if (mediaError || !media) redirect(`/admin/apparence?erreur=${encodeURIComponent(mediaError?.message ?? 'Logo introuvable.')}`);
+  const logoUrl = supabase.storage.from(media.bucket_id).getPublicUrl(media.storage_path).data.publicUrl;
+  const { error } = await supabase.from('app_settings').update({ value: logoUrl, updated_by: admin.id, updated_at: new Date().toISOString() }).eq('key', 'logo_url').select('key').single();
+  if (error) redirect(`/admin/apparence?erreur=${encodeURIComponent(error.message)}`);
+  revalidatePath('/', 'layout');
+  redirect('/admin/apparence?message=Logo%20VolleyPéi%20mis%20à%20jour.');
+}

@@ -9,6 +9,7 @@ import VisitTracker from '@/components/layout/VisitTracker';
 import { getCurrentIdentity } from '@/lib/auth';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { signOut } from '@/app/auth/actions';
+import { LogoProvider } from '@/components/layout/LogoProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -37,22 +38,25 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const identity = await getCurrentIdentity();
+  const [identity, supabase] = await Promise.all([getCurrentIdentity(), createServerSupabaseClient()]);
+  const { data: logoSetting } = await supabase.from('app_settings').select('value').eq('key', 'logo_url').maybeSingle();
+  const logoUrl = logoSetting?.value ?? '/brand/volley-pei.png';
   const blocked = Boolean(identity && identity.profile?.status !== 'active');
   let unreadNotifications = 0;
   if (identity && !blocked) {
-    const supabase = await createServerSupabaseClient();
     const { count } = await supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('recipient_id', identity.id).is('read_at', null);
     unreadNotifications = count ?? 0;
   }
   return (
     <html lang="fr" className={`${inter.variable} ${display.variable}`}>
       <body className="font-sans min-h-screen flex flex-col">
+        <LogoProvider logoUrl={logoUrl}>
         <SplashScreen />
         {identity && !blocked && <VisitTracker />}
         <Header identity={identity && !blocked ? { username: identity.profile?.username ?? 'Profil', avatarPath: identity.profile?.avatar_path ?? null, isAdmin: identity.isAdmin } : null} unreadNotifications={unreadNotifications} />
         <main className={`flex-1 ${identity && !blocked ? 'pb-24 md:pb-0' : ''}`}>{blocked ? <section className="px-4 py-20 text-center"><div className="mx-auto max-w-lg rounded-3xl border border-red-200 bg-white p-8 shadow-card"><h1 className="font-display text-3xl font-semibold">Compte indisponible</h1><p className="mt-3 text-sm leading-6 text-ink-500">Ce compte est suspendu ou supprimé. Contacte l’équipe VolleyPéi si tu penses qu’il s’agit d’une erreur.</p><form action={signOut} className="mt-6"><button className="rounded-xl bg-ink-950 px-5 py-3 text-sm font-semibold text-white">Se déconnecter</button></form></div></section> : children}</main>
         {identity && !blocked && <Footer />}
+        </LogoProvider>
       </body>
     </html>
   );
